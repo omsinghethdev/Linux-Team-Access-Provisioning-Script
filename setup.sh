@@ -1,43 +1,30 @@
 #!/usr/bin/env bash
 
 echo "Starting setup....."
+read -p "Enter the users name to create:" -a  users
+read -p "Enter the groups name to create:" -a groups
 
-for user in dev1 dev2 intern
-do
-	sudo useradd -m $user
+echo "Creating the group..."
+
+for group in "${groups[@]}"; do
+	if  getent group "${group}" ; then
+		echo "Group "${group}" already exist."
+	else
+		echo "Creating "${group}". "
+		sudo groupadd "${group}"
+ 	fi
 done
 
-if [[ $? -eq 0 ]]; then
-	echo "Users created"
-else
-	echo "User already exists or failed"
-fi
-sudo groupadd devteam
+echo "Creating the user..."
 
-if [[ $? -eq 0 ]]; then
-	echo "Group created"
-else
-	echo "Group already exists or failed"
-fi
-for user in dev1 dev2
-do
-	sudo usermod -aG devteam $user
+for user in "${users[@]}"; do
+	if getent passwd "${user}" ; then
+		echo "User "${user}" alreay exits."
+	else
+		echo "Creating "${user}"."
+		sudo useradd -m "${user}"
+	fi
 done
-if [[ $? -eq 0 ]]; then
-	echo "User added to group"
-else
-	exit 1
-fi
-sudo mkdir -p /project
-if [[ $? -eq  0 ]]; then
-	echo "Project directory created"
-else
-	exit 1
-fi
-sudo chown dev1:devteam /project
-echo "Ownership set"
-sudo chmod 750 /project
-echo "Permission set."
-echo "Setup complete!"
+echo "All users and groups are created"
 
 
