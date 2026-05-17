@@ -60,9 +60,10 @@ for display_user in "${users[@]}"; do
 	((usernum+=1))
 done
 groupnum=1
-echo "Avilable Group"
+echo "Available Group"
 for display_group in "${groups[@]}"; do
 	echo "${groupnum}.${display_group}"
+	((groupnum+=1))
 done
 
 while true; do
@@ -71,7 +72,7 @@ while true; do
 	echo "Adding user to groups..."
 	sudo usermod -aG "$(IFS=,; echo "${selected_groups[*]}")" "$selected_user"
 	if [[ $? -eq 0 ]]; then
-		echo "Added ${selectded_user} to selected groups."
+		echo "Added ${selected_user} to selected groups."
 	else
 		echo "Failed to add user."
 	fi
@@ -85,3 +86,24 @@ while true; do
 	fi
 done
 
+
+echo "------------Setting up Project-----------------"
+
+read -p "Enter the project name:" project_name
+echo "Creating Project ..."
+	mkdir -p ~/Desktop/"${project_name}"
+echo "Creating Groups in project..."
+for project_group in "${groups[@]}"; do
+	mkdir -p ~/Desktop/"${project_name}"/"${project_group}"
+done
+
+echo "--------Setting up Permissions------------"
+
+read -p "Enter the permission(eg.. 770/775):" permission
+echo "Setting folder group owner and permissions...."
+for gp_owner in "${groups[@]}"; do
+	sudo chgrp  "${gp_owner}" ~/Desktop/"${project_name}"/"${gp_owner}"
+	sudo chmod "${permission}" ~/Desktop/"${project_name}"/"${gp_owner}"
+
+    echo "Configured ${gp_owner} folder."
+done
