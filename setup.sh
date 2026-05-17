@@ -53,4 +53,35 @@ done
 fi
 echo "------------------------------------------------"
 
+echo "Entered Users."
+usernum=1
+for display_user in "${users[@]}"; do
+	echo "${usernum}.${display_user}"
+	((usernum+=1))
+done
+groupnum=1
+echo "Avilable Group"
+for display_group in "${groups[@]}"; do
+	echo "${groupnum}.${display_group}"
+done
+
+while true; do
+	read -p "Enter the user:" selected_user
+	read -p "Enter the groups(space seperated):" -a selected_groups
+	echo "Adding user to groups..."
+	sudo usermod -aG "$(IFS=,; echo "${selected_groups[*]}")" "$selected_user"
+	if [[ $? -eq 0 ]]; then
+		echo "Added ${selectded_user} to selected groups."
+	else
+		echo "Failed to add user."
+	fi
+	read -p "Do you want to continue(yes/no)?" confirm
+
+	if [[ ${confirm} == "yes" ]]; then
+		continue
+	else
+		echo "Exiting Script.."
+		break
+	fi
+done
 
